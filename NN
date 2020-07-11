@@ -1,0 +1,49 @@
+from keras import Sequential
+from keras.layers import Dense,Conv2D,MaxPooling2D,Flatten,Dropout
+#forming model
+model=Sequential()
+#adding layers and forming the model
+model.add(Conv2D(64,kernel_size=5,strides=1,padding="Same",activation="relu",input_shape=(40,5,1)))
+model.add(MaxPooling2D(padding="same"))
+
+model.add(Conv2D(128,kernel_size=5,strides=1,padding="same",activation="relu"))
+model.add(MaxPooling2D(padding="same"))
+model.add(Dropout(0.3))
+
+model.add(Flatten())
+
+model.add(Dense(256,activation="relu"))
+model.add(Dropout(0.3))
+
+model.add(Dense(512,activation="relu"))
+model.add(Dropout(0.3))
+
+model.add(Dense(10,activation="softmax"))
+
+
+#compiling
+model.compile(optimizer="adam",loss="categorical_crossentropy",metrics=["accuracy"])
+
+#training the model
+history=model.fit(x_train,y_train,batch_size=50,epochs=30,validation_data=(x_test,y_test))
+
+#train and test loss and scores respectively
+train_loss_score=model.evaluate(x_train,y_train)
+test_loss_score=model.evaluate(x_test,y_test)
+print(train_loss_score)
+print(test_loss_score)
+
+#model accuracy plot
+plt.plot(history.history['acc'])
+plt.plot(history.history['val_acc'])
+plt.title('model accuracy')
+plt.ylabel('accuracy')
+plt.xlabel('epoch')
+plt.legend(['train', 'val'], loc='upper left')
+plt.show()
+
+# save model and architecture to single file
+model.save("model.h5")
+print("Saved model to disk")
+
+
