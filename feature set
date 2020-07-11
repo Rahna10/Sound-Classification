@@ -1,0 +1,91 @@
+#downloading and extracting the dataset on colab's server
+import urllib.request
+urllib.request.urlretrieve ("https://zenodo.org/record/1203745/files/UrbanSound8K.tar.gz","a.tar.gz")
+import tarfile
+tar = tarfile.open("a.tar.gz")
+tar.extractall()
+tar.close()
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import os
+from tqdm import tqdm
+from librosa import display
+import librosa
+
+#forming a panda dataframe from the metadata file
+data=pd.read_csv("UrbanSound8K/metadata/UrbanSound8K.csv")
+#head of the dataframe
+data.head()
+#count of datapoints in each of the folders
+data["fold"].value_counts()
+
+#feature set
+#This file is of a dog bark
+y,sr=librosa.load("UrbanSound8K/audio/fold5/100032-3-0-0.wav")
+mfccs = librosa.feature.mfcc(y, sr, n_mfcc=40)
+melspectrogram =librosa.feature.melspectrogram(y=y, sr=sr, n_mels=40,fmax=8000)
+chroma_stft=librosa.feature.chroma_stft(y=y, sr=sr,n_chroma=40)
+chroma_cq =librosa.feature.chroma_cqt(y=y, sr=sr,n_chroma=40)
+chroma_cens =librosa.feature.chroma_cens(y=y, sr=sr,n_chroma=40)
+melspectrogram.shape,chroma_stft.shape,chroma_cq.shape,chroma_cens.shape,mfccs.shape
+
+
+#MFCC of dog bark
+import matplotlib.pyplot as plt
+plt.figure(figsize=(10,4))
+librosa.display.specshow(mfccs, x_axis='time')
+plt.colorbar()
+plt.title('MFCC')
+plt.tight_layout()
+
+
+#feature set
+y,sr=librosa.load("UrbanSound8K/audio/fold5/100263-2-0-137.wav")
+mfccs = np.mean(librosa.feature.mfcc(y, sr, n_mfcc=40).T,axis=0)
+melspectrogram = np.mean(librosa.feature.melspectrogram(y=y, sr=sr, n_mels=40,fmax=8000).T,axis=0)
+chroma_stft=np.mean(librosa.feature.chroma_stft(y=y, sr=sr,n_chroma=40).T,axis=0)
+chroma_cq = np.mean(librosa.feature.chroma_cqt(y=y, sr=sr,n_chroma=40).T,axis=0)
+chroma_cens = np.mean(librosa.feature.chroma_cens(y=y, sr=sr,n_chroma=40).T,axis=0)
+melspectrogram.shape,chroma_stft.shape,chroma_cq.shape,chroma_cens.shape,mfccs.shape
+
+#stacking and reshaping
+features=np.reshape(np.vstack((mfccs,melspectrogram,chroma_stft,chroma_cq,chroma_cens)),(40,5))
+features.shape
+
+
+#Melspectrogram of a dog bark
+plt.figure(figsize=(10,4))
+librosa.display.specshow(librosa.power_to_db(melspectrogram,ref=np.max),y_axis='mel', fmax=8000,x_axis='time')
+plt.colorbar(format='%+2.0f dB')
+plt.title('Mel spectrogram')
+plt.tight_layout()
+
+#Chromagram of dog bark
+plt.figure(figsize=(10,4))
+librosa.display.specshow(chroma_stft, y_axis='chroma', x_axis='time')
+plt.colorbar()
+plt.title('Chromagram')
+plt.tight_layout()
+
+#Chroma cqt of a dog bark
+plt.figure(figsize=(10,4))
+librosa.display.specshow(chroma_cq, y_axis='chroma', x_axis='time')
+plt.colorbar()
+plt.title('chroma_cqt')
+plt.tight_layout()
+
+#feature set
+y,sr=librosa.load("UrbanSound8K/audio/fold5/100263-2-0-137.wav")
+mfccs = np.mean(librosa.feature.mfcc(y, sr, n_mfcc=40).T,axis=0)
+melspectrogram = np.mean(librosa.feature.melspectrogram(y=y, sr=sr, n_mels=40,fmax=8000).T,axis=0)
+chroma_stft=np.mean(librosa.feature.chroma_stft(y=y, sr=sr,n_chroma=40).T,axis=0)
+chroma_cq = np.mean(librosa.feature.chroma_cqt(y=y, sr=sr,n_chroma=40).T,axis=0)
+chroma_cens = np.mean(librosa.feature.chroma_cens(y=y, sr=sr,n_chroma=40).T,axis=0)
+melspectrogram.shape,chroma_stft.shape,chroma_cq.shape,chroma_cens.shape,mfccs.shape
+
+#stacking and reshaping
+features=np.reshape(np.vstack((mfccs,melspectrogram,chroma_stft,chroma_cq,chroma_cens)),(40,5))
+features.shape
+
